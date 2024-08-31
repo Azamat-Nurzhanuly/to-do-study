@@ -1,13 +1,20 @@
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-import json
+from fastapi import FastAPI
+from router import router as items_router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+app.include_router(items_router)
 
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
-@app.get("/")
-async def root(request: Request):
-    with open('database.json') as f:
-        data = json.load(f)
-    return templates.TemplateResponse("todolist.html", {"request": request, "tododict": data})
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
